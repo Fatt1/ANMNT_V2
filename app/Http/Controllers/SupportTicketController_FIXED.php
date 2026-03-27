@@ -17,29 +17,6 @@ class SupportTicketController extends Controller
     public function store(Request $request)
     {
         // =====================================================================
-        // [BUG - LỖ HỔNG GỐC] Unrestricted File Upload
-        // Validation chỉ kiểm tra file có tồn tại, KHÔNG kiểm tra extension.
-        // Kẻ tấn công có thể upload file .php và truy cập qua URL để RCE.
-        // =====================================================================
-        // $request->validate([
-        //     'subject'       => 'required',
-        //     'message'       => 'required',
-        //     'evidence_file' => 'required|file'   // ← CHỈ CÓ VẬY, KHÔNG CHECK .php
-        // ]);
-        //
-        // $file = $request->file('evidence_file');
-        //
-        // // Lấy tên gốc từ client (có thể là "hacker.php") → move vào public/
-        // $originalFileName = $file->getClientOriginalName();
-        // $file->move(public_path('uploads/reviews'), $originalFileName);
-        //
-        // // Sau đó truy cập: /uploads/reviews/hacker.php?cmd=whoami → RCE!
-        // =====================================================================
-        // [END BUG]
-        // =====================================================================
-
-
-        // =====================================================================
         // [FIX 1] Validate đúng: chỉ cho phép ảnh, pdf, txt (whitelist extension)
         // Không dùng blacklist vì dễ bypass (.php5, .phtml, .pHp, ...)
         // =====================================================================
@@ -57,11 +34,6 @@ class SupportTicketController extends Controller
 
         $file = $request->file('evidence_file');
 
-        // =====================================================================
-        // [FIX 2] KHÔNG dùng tên gốc từ client
-        // Tạo tên file ngẫu nhiên + giữ extension đã được validate
-        // Tránh: path traversal, ghi đè file, tên file độc hại
-        // =====================================================================
         // =====================================================================
         // [FIX 2] KHÔNG dùng tên file gốc từ client vì 3 lý do:
         //

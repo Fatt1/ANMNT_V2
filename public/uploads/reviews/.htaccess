@@ -1,0 +1,24 @@
+# =====================================================================
+# [FIX 4] Unrestricted File Upload - Defense in Depth
+# Chặn Apache execute bất kỳ script nào trong thư mục này.
+# Ngay cả khi kẻ tấn công bypass được validation ở Controller,
+# server cũng sẽ từ chối chạy file PHP → chỉ trả về raw text.
+# =====================================================================
+
+# Vô hiệu hóa PHP handler cho thư mục này
+<FilesMatch "\.php$">
+    Deny from all
+</FilesMatch>
+
+# Hoặc trên Apache 2.4+ dùng cú pháp mới:
+# <FilesMatch "\.php$">
+#     Require all denied
+# </FilesMatch>
+
+# Chặn toàn bộ các extension script nguy hiểm
+<FilesMatch "\.(php|php3|php4|php5|php7|phtml|phar|shtml|cgi|pl|py|sh|rb)$">
+    Deny from all
+</FilesMatch>
+
+# Không cho phép list thư mục
+Options -Indexes
