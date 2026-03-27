@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+@import url('https://fonts.bunny.net/css?family=fraunces:400,500,700|space-grotesk:400,500,700');
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Fraunces', serif;
+    --color-brand-50: #fef6eb;
+    --color-brand-100: #fdeacf;
+    --color-brand-500: #cc5f1f;
+    --color-brand-700: #8f3d13;
+    --color-ink-900: #1f1a17;
+    --color-surface: #fff9f3;
+}
+
+@layer base {
+    body {
+        @apply bg-[--color-surface] text-[--color-ink-900];
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-family: var(--font-display);
+    }
+}
+
+@layer components {
+    .shop-shell {
+        @apply min-h-screen bg-linear-to-br from-[#fff8ee] via-surface to-[#fbe9dd];
+    }
+
+    .shop-card {
+        @apply rounded-2xl border border-[#edd9c9] bg-white/85 shadow-sm backdrop-blur;
+    }
+
+    .shop-btn {
+        @apply inline-flex items-center justify-center rounded-xl bg-[--color-brand-500] px-4 py-2 font-semibold text-white transition hover:bg-[--color-brand-700];
+    }
+
+    .shop-btn-muted {
+        @apply inline-flex items-center justify-center rounded-xl border border-[#d7c6b8] bg-white px-4 py-2 font-semibold text-[#3f342d] transition hover:bg-[#f8efe8];
+    }
+
+    .shop-input {
+        @apply w-full rounded-xl border border-[#d9cbbf] bg-white px-3 py-2 outline-none ring-0 focus:border-[--color-brand-500];
+    }
+}
