@@ -31,6 +31,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 ? $e->getStatusCode()
                 : 500;
 
-            return response()->view('errors.generic', ['status' => $status], $status);
+            // Show only explicit HTTP exception messages (e.g. abort(400, '...')).
+            // Do not expose internal exception details for non-HTTP errors.
+            $message = null;
+            if ($e instanceof HttpExceptionInterface) {
+                $message = trim($e->getMessage()) !== '' ? $e->getMessage() : null;
+            }
+
+            return response()->view('errors.generic', [
+                'status' => $status,
+                'message' => $message,
+            ], $status);
         });
     })->create();

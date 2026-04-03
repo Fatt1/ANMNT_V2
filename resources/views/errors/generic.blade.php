@@ -12,7 +12,7 @@
     <div class="mx-auto flex min-h-screen max-w-xl items-center px-4">
         <div class="shop-card w-full p-8 text-center">
             <p class="text-xs uppercase tracking-[0.2em] text-[#8a6f5a]">Error {{ $status ?? 500 }}</p>
-            <h1 class="mt-2 text-4xl font-semibold">Request could not be completed</h1>
+            <h1 class="mt-2 text-4xl font-semibold">{{ $message ?? 'Request could not be completed' }}</h1>
             <p class="mt-3 text-sm text-[#695b51]">Please try again later or go back to the home page.</p>
             <a href="" class="shop-btn mt-6">Back To Store</a>
         </div>
