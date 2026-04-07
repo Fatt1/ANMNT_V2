@@ -25,7 +25,7 @@ class AuthController extends Controller
             $matchedUsers = DB::select($sql);
 
 
-            // Solution use paramester
+            // Solution use parameterized query
             // $sql_parameterized = "SELECT id FROM users WHERE email = ? AND password = ?";
             // $matchedUsers = DB::select($sql_parameterized, [$email, $password]);
 

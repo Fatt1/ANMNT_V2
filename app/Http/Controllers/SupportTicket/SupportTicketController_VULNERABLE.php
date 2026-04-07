@@ -45,6 +45,6 @@ class SupportTicketController extends Controller
         //     'updated_at'    => now()
         // ]);
 
-        return redirect()->back()->with('success', 'Ticket submitted! File uploaded to: /uploads/reviews/' . $originalFileName);
+        return redirect()->back()->with('success', 'Ticket submitted successfully.');
     }
 }

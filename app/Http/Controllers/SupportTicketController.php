@@ -17,29 +17,6 @@ class SupportTicketController extends Controller
     public function store(Request $request)
     {
         // =====================================================================
-        // [BUG - LỖ HỔNG GỐC] Unrestricted File Upload
-        // Validation chỉ kiểm tra file có tồn tại, KHÔNG kiểm tra extension.
-        // Kẻ tấn công có thể upload file .php và truy cập qua URL để RCE.
-        // =====================================================================
-        // $request->validate([
-        //     'subject'       => 'required',
-        //     'message'       => 'required',
-        //     'evidence_file' => 'required|file'   // ← CHỈ CÓ VẬY, KHÔNG CHECK .php
-        // ]);
-        //
-        // $file = $request->file('evidence_file');
-        //
-        // // Lấy tên gốc từ client (có thể là "hacker.php") → move vào public/
-        // $originalFileName = $file->getClientOriginalName();
-        // $file->move(public_path('uploads/reviews'), $originalFileName);
-        //
-        // // Sau đó truy cập: /uploads/reviews/hacker.php?cmd=whoami → RCE!
-        // =====================================================================
-        // [END BUG]
-        // =====================================================================
-
-
-        // =====================================================================
         // [FIX 1] Validate đúng: chỉ cho phép ảnh, pdf, txt (whitelist extension)
         // Không dùng blacklist vì dễ bypass (.php5, .phtml, .pHp, ...)
         // =====================================================================
@@ -52,16 +29,32 @@ class SupportTicketController extends Controller
                 'max:2048', // Tối đa 2MB
                 // Whitelist MIME type thực sự của file (đọc binary, không tin client)
                 'mimes:jpg,jpeg,png,gif,pdf,txt',
+                function ($attribute, $value, $fail) {
+                    // =====================================================================
+                    // Kiểm tra MIME type THỰC SỰ từ binary, không tin client
+                    // Hacker upload hacker.php nhưng đổi tên thành hacker.jpg
+                    // → extension là .jpg nhưng MIME type từ magic bytes là application/x-php
+                    // =====================================================================
+                    $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $value->getPathname());
+                    
+                    // Whitelist MIME type an toàn
+                    $allowedMimes = [
+                        'image/jpeg',
+                        'image/png',
+                        'image/gif',
+                        'application/pdf',
+                        'text/plain',
+                    ];
+                    
+                    if (!in_array($mimeType, $allowedMimes)) {
+                        $fail("The $attribute file type is not allowed. Detected: $mimeType");
+                    }
+                }
             ],
         ]);
 
         $file = $request->file('evidence_file');
 
-        // =====================================================================
-        // [FIX 2] KHÔNG dùng tên gốc từ client
-        // Tạo tên file ngẫu nhiên + giữ extension đã được validate
-        // Tránh: path traversal, ghi đè file, tên file độc hại
-        // =====================================================================
         // =====================================================================
         // [FIX 2] KHÔNG dùng tên file gốc từ client vì 3 lý do:
         //
@@ -116,6 +109,6 @@ class SupportTicketController extends Controller
         //     'updated_at'     => now()
         // ]);
 
-        return redirect()->back()->with('success', 'Ticket submitted! File uploaded successfully.');
+        return redirect()->back()->with('success', 'Ticket submitted successfully.');
     }
 }

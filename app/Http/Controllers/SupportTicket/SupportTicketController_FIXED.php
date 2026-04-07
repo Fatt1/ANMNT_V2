@@ -29,6 +29,27 @@ class SupportTicketController extends Controller
                 'max:2048', // Tối đa 2MB
                 // Whitelist MIME type thực sự của file (đọc binary, không tin client)
                 'mimes:jpg,jpeg,png,gif,pdf,txt',
+                function ($attribute, $value, $fail) {
+                    // =====================================================================
+                    // Kiểm tra MIME type THỰC SỰ từ binary, không tin client
+                    // Hacker upload hacker.php nhưng đổi tên thành hacker.jpg
+                    // → extension là .jpg nhưng MIME type từ magic bytes là application/x-php
+                    // =====================================================================
+                    $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $value->getPathname());
+                    
+                    // Whitelist MIME type an toàn
+                    $allowedMimes = [
+                        'image/jpeg',
+                        'image/png',
+                        'image/gif',
+                        'application/pdf',
+                        'text/plain',
+                    ];
+                    
+                    if (!in_array($mimeType, $allowedMimes)) {
+                        $fail("The $attribute file type is not allowed. Detected: $mimeType");
+                    }
+                }
             ],
         ]);
 
@@ -88,6 +109,6 @@ class SupportTicketController extends Controller
         //     'updated_at'     => now()
         // ]);
 
-        return redirect()->back()->with('success', 'Ticket submitted! File uploaded successfully.');
+        return redirect()->back()->with('success', 'Ticket submitted successfully.');
     }
 }

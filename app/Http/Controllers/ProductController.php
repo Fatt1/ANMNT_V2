@@ -26,11 +26,11 @@ class ProductController extends Controller
             // [VULNERABILITY: SQL Injection (Union-Based / Blind)]
             // The unescaped parameter `$id` is directly appended to the query.
             $sql = "SELECT * FROM products WHERE id = " . $id;
-            // $products = DB::select($sql);
+             $products = DB::select($sql);
+             $product = !empty($products) ? $products[0] : null;
 
-
-            // $product = !empty($products) ? $products[0] : null;
-            $product = Product::where('id', $id)->first();
+             // Solution: Use parameterized queries to prevent SQL injection
+            // $product = Product::where('id', $id)->first();
             if (!$product) {
                 abort(404, 'Product not found.');
             }
@@ -67,6 +67,7 @@ class ProductController extends Controller
             //SUMMER20'# 
             $sql = "SELECT * FROM coupons WHERE code = '$code' AND is_active = 1";
             $results = DB::select($sql);
+            // Solution: Use parameterized queries to prevent SQL injection
             // $sql_parameterized  = "SELECT * FROM coupons WHERE code = ? AND is_active = 1";
             // $results = DB::select($sql_parameterized, [$code]);
             if (count($results) > 0) {
