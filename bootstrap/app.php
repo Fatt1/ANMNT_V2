@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -27,9 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            $status = $e instanceof HttpExceptionInterface
-                ? $e->getStatusCode()
-                : 500;
+            $status = match (true) {
+                $e instanceof HttpExceptionInterface => $e->getStatusCode(),
+                $e instanceof ModelNotFoundException => 404,
+                default => 500,
+            };
 
             // Show only explicit HTTP exception messages (e.g. abort(400, '...')).
             // Do not expose internal exception details for non-HTTP errors.
